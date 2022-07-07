@@ -86,7 +86,7 @@ const Graph2 = props => {
 	};
 
 	mxIconSet.prototype.destroy = function () {
-		if (this.images != null) {
+		if (this.images !== null) {
 			for (var i = 0; i < this.images.length; i++) {
 				var img = this.images[i];
 				img.parentNode.removeChild(img);
@@ -99,7 +99,7 @@ const Graph2 = props => {
 	function main() {
 		// Defines an icon for creating new connections in the connection handler.
 		// This will automatically disable the highlighting of the source vertex.
-		mxConnectionHandler.connectImage = new mxImage('images/green-dot.gif', 16, 16);
+		mxConnectionHandler.connectImage = new mxImage('images/connector.gif', 16, 16);
 		// Checks if browser is supported
 		if (!mxClient.isBrowserSupported()) {
 			// Displays an error message if the browser is
@@ -170,6 +170,7 @@ const Graph2 = props => {
 			graph.getTooltipForCell = function (cell) {
 				return 'Doubleclick and right- or shiftclick';
 			}
+			console.log(graph);
 
 			// Installs a popupmenu handler using local function (see below).
 			graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
@@ -177,14 +178,12 @@ const Graph2 = props => {
 			};
 
 			const addVertex = function (icon, w, h, style) {
-				console.log(style);
 				const vertex = new mxCell(null, new mxGeometry(0, 0, w, h), style);
 				vertex.setVertex(true);
 
 				addToolbarItem(graph, toolbar, vertex, icon);
 			};
 			const img = 'https://jgraph.github.io/mxgraph/javascript/examples/grapheditor/www/stencils/clipart/Earth_globe_128x128.png';
-			console.log(`shape=image;image=${img};imageWidth=16;imageHeight=16;spacingBottom=10`);
 			addVertex(img, 50, 50, `shape=image;image=${img};imageWidth=16;imageHeight=16;spacingBottom=10;`);
 			toolbar.addLine();
 
@@ -199,14 +198,14 @@ const Graph2 = props => {
 			currentIconSet: null,
 			mouseDown: function (sender, me) {
 				// Hides icons on mouse down
-				if (this.currentState != null) {
+				if (this.currentState !== null) {
 					this.dragLeave(me.getEvent(), this.currentState);
 					this.currentState = null;
 				}
 			},
 			mouseMove: function (sender, me) {
-				if (this.currentState != null && (me.getState() == this.currentState ||
-						me.getState() == null)) {
+				if (this.currentState !== null && (me.getState() === this.currentState ||
+						me.getState() === null)) {
 					var tol = iconTolerance;
 					var tmp = new mxRectangle(me.getGraphX() - tol,
 						me.getGraphY() - tol, 2 * tol, 2 * tol);
@@ -219,30 +218,30 @@ const Graph2 = props => {
 				var tmp = graph.view.getState(me.getCell());
 
 				// Ignores everything but vertices
-				if (graph.isMouseDown || (tmp != null && !graph.getModel().isVertex(tmp.cell))) {
+				if (graph.isMouseDown || (tmp !== null && !graph.getModel().isVertex(tmp.cell))) {
 					tmp = null;
 				}
 
-				if (tmp != this.currentState) {
-					if (this.currentState != null) {
+				if (tmp !== this.currentState) {
+					if (this.currentState !== null) {
 						this.dragLeave(me.getEvent(), this.currentState);
 					}
 
 					this.currentState = tmp;
 
-					if (this.currentState != null) {
+					if (this.currentState !== null) {
 						this.dragEnter(me.getEvent(), this.currentState);
 					}
 				}
 			},
 			mouseUp: function (sender, me) {},
 			dragEnter: function (evt, state) {
-				if (this.currentIconSet == null) {
+				if (this.currentIconSet === null) {
 					this.currentIconSet = new mxIconSet(state);
 				}
 			},
 			dragLeave: function (evt, state) {
-				if (this.currentIconSet != null) {
+				if (this.currentIconSet !== null) {
 					this.currentIconSet.destroy();
 					this.currentIconSet = null;
 				}
@@ -271,7 +270,7 @@ const Graph2 = props => {
 	}
 
 	function createPopupMenu(graph, menu, cell, evt) {
-		if (cell != null) {
+		if (cell !== null) {
 			menu.addItem('Cell Item', 'images/image.gif', function () {
 				mxUtils.alert('MenuItem1');
 			});
