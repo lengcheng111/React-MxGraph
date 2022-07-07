@@ -11,3 +11,9 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+g > image {
+  min-width: 50px !important;
+  min-height: 50px !important;
+  object-fit: contain;
+}

@@ -5,7 +5,7 @@ import connector from './../images/connector.gif';
 const mx = require('mxgraph')({
     mxBasePath: 'mxgraph'
   })
-const { mxGraph, mxConnectionHandler,mxImage,mxToolbar, mxGraphModel,mxEvent,mxClient,mxUtils,mxCell,mxGeometry, mxConstants } = mx
+const { mxGraph, mxConnectionHandler,mxImage,mxToolbar, mxGraphModel,mxEvent,mxClient,mxUtils,mxCell,mxGeometry, mxConstants,mxDragSource } = mx;
 
 const Graph = props => {
     console.log('render !');
@@ -36,7 +36,20 @@ const Graph = props => {
             // using the fastest rendering available on the browser
             const model = new mxGraphModel();
             const graph = new mxGraph(document.getElementById('main-container-id'), model);
+            graph.dropEnabled = true;
 
+            // Matches DnD inside the graph
+            mxDragSource.prototype.getDropTarget = function(graph, x, y)
+            {
+                var cell = graph.getCellAt(x, y);
+                
+                if (!graph.isValidDropTarget(cell))
+                {
+                    cell = null;
+                }
+                
+                return cell;
+            };
             // Enables new connections in the graph
             graph.setConnectable(true);
             graph.setMultigraph(false);
@@ -46,8 +59,8 @@ const Graph = props => {
             // const rubberband = new mxRubberband(graph);
             const addVertex = (icon, w, h, style) => {
                 // var style = graph.getStylesheet().getDefaultVertexStyle();
-                style[mxConstants.STYLE_SHAPE] = mxConstants.STYLE_IMAGE;
-                style[mxConstants.STYLE_IMAGE] = 'https://img.alicdn.com/tfs/TB1i4I1wxTpK1RjSZR0XXbEwXXa-80-80.svg';
+                // style[mxConstants.STYLE_SHAPE] = mxConstants.STYLE_IMAGE;
+                // style[mxConstants.STYLE_IMAGE] = 'https://img.alicdn.com/tfs/TB1i4I1wxTpK1RjSZR0XXbEwXXa-80-80.svg';
 
 
                 const vertex = new mxCell(null, new mxGeometry(0, 0, w, h), style);
@@ -70,7 +83,7 @@ const Graph = props => {
             // addVertex('https://jgraph.github.io/mxgraph/javascript/examples/editors/images/rhombus.gif', 40, 40, 'shape=rhombus');
             // addVertex('https://jgraph.github.io/mxgraph/javascript/examples/editors/images/triangle.gif', 40, 40, 'shape=triangle');
             // addVertex('https://jgraph.github.io/mxgraph/javascript/examples/editors/images/cylinder.gif', 40, 40, 'shape=cylinder');
-            // addVertex('https://jgraph.github.io/mxgraph/javascript/examples/editors/images/actor.gif', 30, 40, 'shape=actor1');
+            addVertex('https://jgraph.github.io/mxgraph/javascript/examples/editors/images/actor.gif', 30, 40, 'shape=actor1');
         }
     };
 
