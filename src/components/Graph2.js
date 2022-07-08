@@ -105,14 +105,12 @@ const Graph2 = props => {
 		this.images = null;
 	};
 
-	
-
 	const createDropHandler = (cells) => {
 		return function (graph, evt, target, x, y) {
 		  const select = graph.importCells(cells, x, y, target);
 		  graph.setSelectionCells(select);
 		};
-	  };
+	};
 	
 	const createDragPreview = function (width, height) {
 		var elt = document.createElement('div');
@@ -124,46 +122,6 @@ const Graph2 = props => {
 	
 	const createDragSource = function (elt, dropHandler, preview) {
 		return mxUtils.makeDraggable(elt, graph, dropHandler, preview, 0, 0, graph.autoscroll, true, true);
-	};
-
-	// const createItem = (id) => {
-	// 	console.log("create item",graph);
-	// 	if (Object.keys(graph).length === 0){
-	// 		return;
-	// 	} else {
-	// 	const elt = document.getElementById(id);
-	// 	const width = elt.clientWidth;
-	// 	const height = elt.clientHeight;
-	
-	// 	const cell = new mxCell('', new mxGeometry(0, 0, width, height), 'fillColor=none;strokeColor=none');
-	// 	cell.vertex = true;
-	// 	graph.model.setValue(cell, elt);
-	
-	// 	const cells = [cell];
-	
-	// 	const bounds = new mxRectangle(0, 0, width, height);
-	// 	createDragSource(elt, createDropHandler(cells, true, false, bounds), createDragPreview(width, height), cells, bounds);
-	// 	}
-	// };
-
-	const createItem = (id) => {
-		console.log("create item",graph);
-		if (Object.keys(graph).length === 0){
-			return;
-		} else {
-		const elt = document.getElementById(id);
-		const width = elt.clientWidth;
-		const height = elt.clientHeight;
-	
-		const cell = new mxCell('', new mxGeometry(0, 0, width, height), 'fillColor=none;strokeColor=none');
-		cell.vertex = true;
-		graph.model.setValue(cell, elt);
-	
-		const cells = [cell];
-	
-		const bounds = new mxRectangle(0, 0, width, height);
-		createDragSource(elt, createDropHandler(cells, true, false, bounds), createDragPreview(width, height), cells, bounds);
-		}
 	};
 
 	const showIconsWhenHover = (graph) => {
@@ -272,39 +230,14 @@ const Graph2 = props => {
 			mxUtils.error('Browser is not supported!', 200, false);
 			return {}
 		} else {
-			
-			// Creates new toolbar without event processing
-			// const tbContainer = document.getElementById('toolbar-container-id');
-			// const toolbar = new mxToolbar(tbContainer);
-			// toolbar.enabled = false;
-			
 			// Disables built-in context menu
-			// mxEvent.disableContextMenu(tbContainer);
-			
-			// Creates the model and the graph inside the container
-			// using the fastest rendering available on the browser
-			// const model = new mxGraphModel();
-			// const graphLocal = new mxGraph(document.getElementById('main-container-id'));
-			// // graphLocal.dropEnabled = true;
-			// graphLocal.htmlLabels = true;
-			
-			// graphLocal.cellsEditable = false;
+			mxEvent.disableContextMenu(document.body);
 
-			// // render as HTML node always. You probably won't want that in real world though
-			// graphLocal.convertValueToString = function(cell) {
-			// 	return cell.value;
-			// }
-
-			// graphLocal.convertValueToString = function(cell) {
-			// 	console.log(cell.value);
-			// 	return cell.value;
-			// }
-			// return graphLocal;
 			mxConnectionHandler.connectImage = new mxImage('images/connector.gif', 16, 16);
 
 			graph = new mxGraph(document.getElementById('main-container-id'));
-			graph.htmlLabels = true;
-			graph.cellsEditable = false;
+			// graph.htmlLabels = true;
+			// graph.cellsEditable = false;
 			graph.setConnectable(true);
 			graph.dropEnabled = true;
 		  
@@ -312,6 +245,43 @@ const Graph2 = props => {
 			graph.convertValueToString = function(cell) {
 			  return cell.value;
 			}
+
+			graph.popupMenuHandler.factoryMethod = function(menu, cell, evt) {
+				console.log(menu);
+				if (!cell) {
+					return;
+				}
+				if(cell.edge){
+					menu.addItem('Delete Line', null, function(e)
+					{ 
+						// alert('This is the first option of edge ');
+						console.log(e);
+						mxUtils.bind(this, function (evt) {
+							console.log(evt);
+							// graph.setSelectionCells(graph.moveCells([state.cell], s, s, true));
+							// mxEvent.consume(evt);
+							// this.destroy();
+						});
+						var s = graph.gridSize;
+						graph.setSelectionCells(graph.moveCells([cell], s, s, true));
+						mxEvent.consume(evt);
+					})
+					menu.addItem('Second edge option', null, function()
+					{
+						alert('This is the second option of edge ');
+					})
+				}
+				if(cell.vertex){
+					menu.addItem('First vertex option', null, function()
+					{
+						alert('This is the first option of vertex ');
+					})
+					menu.addItem('Second vertex option', null, function()
+					{
+						alert('This is the second option of vertex ');
+					})
+				}
+			};
 		  
 			const createDropHandler = function (cells, allowSplit) {
 			  return function (graph, evt, target, x, y) {
