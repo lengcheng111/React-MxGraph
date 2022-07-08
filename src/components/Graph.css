@@ -14,7 +14,7 @@
     overflow: hidden;
     /* left: 0px;
     top: 0px; */
-    width: 124px;
+    width: 200px;
 }
 
 .main-container {
@@ -24,45 +24,38 @@
     background: url('https://img.alicdn.com/tfs/TB1ZP2zj9zqK1RjSZPcXXbTepXa-150-150.png');
 }
 
-.mxToolbarMode {
-    width: 40px;
-    height: 40px;
+.jss402 {
+    width: 36px;
+    height: 36px;
+    text-align: center;
+    border-radius: 50%;
 }
 
-body div.mxPopupMenu {
-    -webkit-box-shadow: 3px 3px 6px #C0C0C0;
-    -moz-box-shadow: 3px 3px 6px #C0C0C0;
-    box-shadow: 3px 3px 6px #C0C0C0;
-    background: darkgrey;
-    color: white;
-    border: none;
-    position: absolute;
-    padding: 3px;
+.MuiListItem-root {
+    width: 100%;
+    display: flex;
+    position: relative;
+    box-sizing: border-box;
+    text-align: left;
+    align-items: center;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    justify-content: flex-start;
+    text-decoration: none;
 }
-body table.mxPopupMenu {
-    border-collapse: collapse;
-    margin: 0px;
+
+.MuiListItemIcon-root {
+    color: rgba(0, 0, 0, 0.54);
+    display: inline-flex;
+    min-width: 56px;
+    flex-shrink: 0;
 }
-body tr.mxPopupMenuItem {
-    color: white;
-    cursor: hand;
-}
-body td.mxPopupMenuItem {
-    padding: 6px 60px 6px 30px;
-    font-family: Arial;
-    font-size: 10pt;
-}
-body td.mxPopupMenuIcon {
-    background-color: white;
-    padding: 0px;
-}
-body tr.mxPopupMenuItemHover {
-    background-color: black;
-    color: white;
-}
-table.mxPopupMenu hr {
-    border-top: solid 1px #cccccc;
-}
-table.mxPopupMenu tr {
-    font-size: 4pt;
+
+.jss396 {
+    width: 100%;
+    cursor: default;
+    padding: 4px 8px 4px 24px;
+    max-width: 100%;
+    min-width: 100%;
+    box-sizing: border-box;
 }

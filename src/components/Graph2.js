@@ -1,5 +1,5 @@
 import React, {
-	useEffect, useState
+	useEffect, useMemo, useState
 } from 'react';
 import './Graph.css';
 import './../lib/css/common.css';
@@ -32,6 +32,8 @@ const {
 } = mx;
 
 const Graph2 = props => {
+
+	let graph = {};
 	function mxIconSet(state) {
 		this.images = [];
 		var graph = state.view.graph;
@@ -103,100 +105,66 @@ const Graph2 = props => {
 		this.images = null;
 	};
 
-	function main() {
-		// Defines an icon for creating new connections in the connection handler.
-		// This will automatically disable the highlighting of the source vertex.
-		mxConnectionHandler.connectImage = new mxImage('images/connector.gif', 16, 16);
-		// Checks if browser is supported
-		if (!mxClient.isBrowserSupported()) {
-			// Displays an error message if the browser is
-			// not supported.
-			mxUtils.error('Browser is not supported!', 200, false);
+	
+
+	const createDropHandler = (cells) => {
+		return function (graph, evt, target, x, y) {
+		  const select = graph.importCells(cells, x, y, target);
+		  graph.setSelectionCells(select);
+		};
+	  };
+	
+	const createDragPreview = function (width, height) {
+		var elt = document.createElement('div');
+		elt.style.border = '1px dashed black';
+		elt.style.width = width + 'px';
+		elt.style.height = height + 'px';
+		return elt;
+	};
+	
+	const createDragSource = function (elt, dropHandler, preview) {
+		return mxUtils.makeDraggable(elt, graph, dropHandler, preview, 0, 0, graph.autoscroll, true, true);
+	};
+
+	// const createItem = (id) => {
+	// 	console.log("create item",graph);
+	// 	if (Object.keys(graph).length === 0){
+	// 		return;
+	// 	} else {
+	// 	const elt = document.getElementById(id);
+	// 	const width = elt.clientWidth;
+	// 	const height = elt.clientHeight;
+	
+	// 	const cell = new mxCell('', new mxGeometry(0, 0, width, height), 'fillColor=none;strokeColor=none');
+	// 	cell.vertex = true;
+	// 	graph.model.setValue(cell, elt);
+	
+	// 	const cells = [cell];
+	
+	// 	const bounds = new mxRectangle(0, 0, width, height);
+	// 	createDragSource(elt, createDropHandler(cells, true, false, bounds), createDragPreview(width, height), cells, bounds);
+	// 	}
+	// };
+
+	const createItem = (id) => {
+		console.log("create item",graph);
+		if (Object.keys(graph).length === 0){
+			return;
 		} else {
-
-			// Creates new toolbar without event processing
-			const tbContainer = document.getElementById('toolbar-container-id');
-			const toolbar = new mxToolbar(tbContainer);
-			toolbar.enabled = false;
-
-			// Disables built-in context menu
-			// mxEvent.disableContextMenu(tbContainer);
-
-			// Creates the model and the graph inside the container
-			// using the fastest rendering available on the browser
-			const model = new mxGraphModel();
-			const graph = new mxGraph(document.getElementById('main-container-id'), model);
-			graph.dropEnabled = true;
-
-			// Matches DnD inside the graph
-			mxDragSource.getDropTarget = function (graph, x, y) {
-				let cell = graph.getCellAt(x, y);
-
-				if (!graph.isValidDropTarget(cell)) {
-					cell = null;
-				}
-
-				return cell;
-			};
-			// Enables rubberband (marquee) selection and a handler
-			// for basic keystrokes (eg. return, escape during editing).
-			// var rubberband = new mxRubberband(graph);
-			// var keyHandler = new mxKeyHandler(graph);
-
-			// Enables tooltips, new connections and panning
-			graph.setPanning(true);
-			graph.setTooltips(true);
-			graph.setConnectable(true);
-
-			// Enables rubberband (marquee) selection and a handler
-			// for basic keystrokes (eg. return, escape during editing).
-			new mxRubberband(graph);
-			new mxKeyHandler(graph);
-
-			// Automatically handle parallel edges
-			var layout = new mxParallelEdgeLayout(graph);
-			var layoutMgr = new mxLayoutManager(graph);
-
-			layoutMgr.getLayout = function (cell) {
-				if (cell.getChildCount() > 0) {
-					return layout;
-				}
-			};
-			// Changes the default style for edges "in-place" and assigns
-			// an alternate edge style which is applied in mxGraph.flip
-			// when the user double clicks on the adjustment control point
-			// of the edge. The ElbowConnector edge style switches to TopToBottom
-			// if the horizontal style is true.
-			// var style = graph.getStylesheet().getDefaultEdgeStyle();
-			// style[mxConstants.STYLE_ROUNDED] = true;
-			// style[mxConstants.STYLE_EDGE] = mxEdgeStyle.ElbowConnector;
-
-			// graph.alternateEdgeStyle = 'elbow=vertical';
-
-			// Installs a custom tooltip for cells
-			graph.getTooltipForCell = function (cell) {
-				return 'Doubleclick and right- or shiftclick';
-			}
-
-			// Installs a popupmenu handler using local function (see below).
-			graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
-				return createPopupMenu(graph, menu, cell, evt);
-			};
-
-			const addVertex = function (icon, w, h, style) {
-				const vertex = new mxCell(null, new mxGeometry(0, 0, w, h), style);
-				vertex.setVertex(true);
-
-				addToolbarItem(graph, toolbar, vertex, icon);
-			};
-			const img = 'https://jgraph.github.io/mxgraph/javascript/examples/grapheditor/www/stencils/clipart/Earth_globe_128x128.png';
-			addVertex(img, 50, 50, `shape=image;image=${img};imageWidth=16;imageHeight=16;spacingBottom=10;`);
-			toolbar.addLine();
-
-			// Shows icons if the mouse is over a cell
-			showIconsWhenHover(graph);
+		const elt = document.getElementById(id);
+		const width = elt.clientWidth;
+		const height = elt.clientHeight;
+	
+		const cell = new mxCell('', new mxGeometry(0, 0, width, height), 'fillColor=none;strokeColor=none');
+		cell.vertex = true;
+		graph.model.setValue(cell, elt);
+	
+		const cells = [cell];
+	
+		const bounds = new mxRectangle(0, 0, width, height);
+		createDragSource(elt, createDropHandler(cells, true, false, bounds), createDragPreview(width, height), cells, bounds);
 		}
-	}
+	};
 
 	const showIconsWhenHover = (graph) => {
 		graph.addMouseListener({
@@ -293,27 +261,129 @@ const Graph2 = props => {
 
 	const [showPanel, setShowPanel] = useState(false);
 
+
+	function initGraph() {
+		// Defines an icon for creating new connections in the connection handler.
+		// This will automatically disable the highlighting of the source vertex.
+		// Checks if browser is supported
+		if (!mxClient.isBrowserSupported()) {
+			// Displays an error message if the browser is
+			// not supported.
+			mxUtils.error('Browser is not supported!', 200, false);
+			return {}
+		} else {
+			
+			// Creates new toolbar without event processing
+			// const tbContainer = document.getElementById('toolbar-container-id');
+			// const toolbar = new mxToolbar(tbContainer);
+			// toolbar.enabled = false;
+			
+			// Disables built-in context menu
+			// mxEvent.disableContextMenu(tbContainer);
+			
+			// Creates the model and the graph inside the container
+			// using the fastest rendering available on the browser
+			// const model = new mxGraphModel();
+			// const graphLocal = new mxGraph(document.getElementById('main-container-id'));
+			// // graphLocal.dropEnabled = true;
+			// graphLocal.htmlLabels = true;
+			
+			// graphLocal.cellsEditable = false;
+
+			// // render as HTML node always. You probably won't want that in real world though
+			// graphLocal.convertValueToString = function(cell) {
+			// 	return cell.value;
+			// }
+
+			// graphLocal.convertValueToString = function(cell) {
+			// 	console.log(cell.value);
+			// 	return cell.value;
+			// }
+			// return graphLocal;
+			mxConnectionHandler.connectImage = new mxImage('images/connector.gif', 16, 16);
+
+			graph = new mxGraph(document.getElementById('main-container-id'));
+			graph.htmlLabels = true;
+			graph.cellsEditable = false;
+			graph.setConnectable(true);
+			graph.dropEnabled = true;
+		  
+			// render as HTML node always. You probably won't want that in real world though
+			graph.convertValueToString = function(cell) {
+			  return cell.value;
+			}
+		  
+			const createDropHandler = function (cells, allowSplit) {
+			  return function (graph, evt, target, x, y) {
+				const select = graph.importCells(cells, x, y, target);
+				graph.setSelectionCells(select);
+			  };
+			};
+		  
+			const createDragPreview = function (width, height) {
+			  var elt = document.createElement('div');
+			  elt.style.border = '1px dashed black';
+			  elt.style.width = width + 'px';
+			  elt.style.height = height + 'px';
+			  return elt;
+			};
+		  
+			const createDragSource = function (elt, dropHandler, preview) {
+			  return mxUtils.makeDraggable(elt, graph, dropHandler, preview, 0, 0, graph.autoscroll, true, true);
+			};
+		  
+			const createItem = (id) => {
+			  const item = document.querySelector(`div#${id}`);
+			  if (!item) {
+				return;
+			  }
+			  const elt = item.firstChild;
+			  if (!elt) {
+				return;
+			  }
+			  const width = elt.clientWidth;
+			  const height = elt.clientHeight;
+		  
+			  const cell = new mxCell('', new mxGeometry(0, 0, width, height), 'fillColor=none;strokeColor=none');
+			  cell.vertex = true;
+			  graph.model.setValue(cell, elt);
+		  
+			  const cells = [cell];
+		  
+			  const bounds = new mxRectangle(0, 0, width, height);
+			  createDragSource(elt, createDropHandler(cells, true, false, bounds), createDragPreview(width, height), cells, bounds);
+			};
+			
+			createItem("AWS--Compute--_Instance--Amazon-EC2_A1-Instance_light-bg");
+			showIconsWhenHover(graph);
+			console.log('render');
+		}
+	}
+
 	useEffect(() => {
-		// main();
+		initGraph();
+		
+		// createItem("AWS--Compute--_Instance--Amazon-EC2_A1-Instance_light-bg");
 	});
 
     return (
-		
 		<div className='geEditor'>
 			<SvgAwsIcons/>
-			<div className="geSidebarContainer">
-				xxx
-			</div>
-			<div className="geDiagramContainer geDiagramBackdrop">
-				abc
-			</div>
 
-			{/* <div className='graph-container'>
-				<div className="toolbar-container" id="toolbar-container-id"/>
-				  { showPanel && <Panel/>}
-				<div className="main-container" id="main-container-id">
+			<div className='graph-container'>
+				<div className="toolbar-container" id="toolbar-container-id">
+					{/* FIXME: hardcode */}
+					<div className="MuiListItem-root jss396 MuiListItem-gutters" tabIndex="0" id="leftbar-a1">
+						<div draggable="true" id="AWS--Compute--_Instance--Amazon-EC2_A1-Instance_light-bg" className="MuiListItemIcon-root">
+							<svg className="MuiSvgIcon-root jss402" focusable="false" viewBox="0 0 50 50" aria-hidden="true"><use href="#AWS--Compute--_Instance--Amazon-EC2_A1-Instance_light-bg"></use></svg>
+						</div>
+						<div className="MuiListItemText-root jss401"><p className="MuiTypography-root MuiListItemText-secondary MuiTypography-body2 MuiTypography-noWrap MuiTypography-displayBlock">EC2 A1 Arm</p></div>
+					</div>
 				</div>
-			</div> */}
+				<div className="main-container" id="main-container-id">
+
+				</div>
+			</div>
         </div>
     );
 };

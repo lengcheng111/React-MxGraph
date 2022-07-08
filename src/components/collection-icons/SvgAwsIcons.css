@@ -1,5 +1,22 @@
-svg {
+#svg-icon-sprite {
     visibility: hidden !important;
     width: 0 !important;
     height: 0 !important;
 }
+
+.aaast1-aws {
+    fill-rule: evenodd;
+    clip-rule: evenodd;
+    fill: #f90
+}
+
+.ahacls-152699482124763654285 {
+    fill: #d86613
+}
+
+.aavcls-101280818971413632358,
+.aawcls-563232066791406906 {
+    fill: #693cc5
+}
+
+
