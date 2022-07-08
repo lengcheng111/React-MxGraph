@@ -4,6 +4,10 @@
     height: 100vh !important;
     overflow: hidden;
     gap: 0 10px;
+    font-family: Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    border: none;
+    margin: 0px;
 }
 
 .toolbar-container {

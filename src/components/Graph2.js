@@ -1,9 +1,10 @@
 import React, {
-	useEffect
+	useEffect, useState
 } from 'react';
 import './Graph.css';
 import './../lib/css/common.css';
 import './../lib/css/explorer.css';
+import Panel from './Panel';
 
 const mx = require('mxgraph')({
 	mxBasePath: 'mxgraph'
@@ -29,7 +30,6 @@ const {
 } = mx;
 
 const Graph2 = props => {
-
 	function mxIconSet(state) {
 		this.images = [];
 		var graph = state.view.graph;
@@ -72,18 +72,23 @@ const Graph2 = props => {
 				mxEvent.consume(evt);
 			})
 		);
-
 		mxEvent.addListener(img, 'click',
-			mxUtils.bind(this, function (evt) {
-				graph.removeCells([state.cell]);
-				mxEvent.consume(evt);
-				this.destroy();
+				mxUtils.bind(this, function (evt) {
+					tooglePanel();
+					graph.removeCells([state.cell]);
+					mxEvent.consume(evt);
+					this.destroy();
 			})
 		);
 
 		state.view.graph.container.appendChild(img);
 		this.images.push(img);
 	};
+
+	const tooglePanel = () => {
+		console.log(showPanel);
+		setShowPanel(!showPanel);
+	}
 
 	mxIconSet.prototype.destroy = function () {
 		if (this.images !== null) {
@@ -113,7 +118,7 @@ const Graph2 = props => {
 			toolbar.enabled = false;
 
 			// Disables built-in context menu
-			mxEvent.disableContextMenu(tbContainer);
+			// mxEvent.disableContextMenu(tbContainer);
 
 			// Creates the model and the graph inside the container
 			// using the fastest rendering available on the browser
@@ -170,7 +175,6 @@ const Graph2 = props => {
 			graph.getTooltipForCell = function (cell) {
 				return 'Doubleclick and right- or shiftclick';
 			}
-			console.log(graph);
 
 			// Installs a popupmenu handler using local function (see below).
 			graph.popupMenuHandler.factoryMethod = function (menu, cell, evt) {
@@ -285,6 +289,8 @@ const Graph2 = props => {
 		});
 	};
 
+	const [showPanel, setShowPanel] = useState(false);
+
 	useEffect(() => {
 		main();
 	});
@@ -293,7 +299,9 @@ const Graph2 = props => {
         <>
 			<div className='graph-container'>
 				<div className="toolbar-container" id="toolbar-container-id"/>
-				<div className="main-container" id="main-container-id"/>
+				  { showPanel && <Panel/>}
+				<div className="main-container" id="main-container-id">
+				</div>
 			</div>
         </>
     );
