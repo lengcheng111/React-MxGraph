@@ -5,6 +5,8 @@ import './Graph.css';
 import './../lib/css/common.css';
 import './../lib/css/explorer.css';
 import Panel from './Panel';
+import './grapheditor.css';
+import SvgAwsIcons from './collection-icons/SvgAwsIcons';
 
 const mx = require('mxgraph')({
 	mxBasePath: 'mxgraph'
@@ -292,18 +294,27 @@ const Graph2 = props => {
 	const [showPanel, setShowPanel] = useState(false);
 
 	useEffect(() => {
-		main();
+		// main();
 	});
 
     return (
-        <>
-			<div className='graph-container'>
+		
+		<div className='geEditor'>
+			<SvgAwsIcons/>
+			<div className="geSidebarContainer">
+				xxx
+			</div>
+			<div className="geDiagramContainer geDiagramBackdrop">
+				abc
+			</div>
+
+			{/* <div className='graph-container'>
 				<div className="toolbar-container" id="toolbar-container-id"/>
 				  { showPanel && <Panel/>}
 				<div className="main-container" id="main-container-id">
 				</div>
-			</div>
-        </>
+			</div> */}
+        </div>
     );
 };
 
