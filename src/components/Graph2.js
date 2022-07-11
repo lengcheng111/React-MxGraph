@@ -23,11 +23,14 @@ const {
 	mxCell,
 	mxGeometry,
 	mxConstants,
-	mxParallelEdgeLayout,
+	mxCodec,
+	mxGraphHandler,
+	mxGuide,
+	mxVertexHandler,
 	mxDragSource,
 	mxLayoutManager,
 	mxRubberband,
-	mxKeyHandler,
+	mxEdgeHandler,
 	iconTolerance,
 	mxRectangle,
 	mxLog
@@ -229,6 +232,31 @@ const Graph2 = props => {
 		});
 	}
 
+	function handleCellAddVertex() {
+		//cells added event
+		graph.addListener(mxEvent.CELLS_ADDED, function(sender, evt) {
+
+			var vertex = evt.getProperties().cells[0];
+			if(vertex.isVertex()){
+				console.log('xxx');
+
+				var decoder = new mxCodec();
+				var nodeModel = decoder.decode(vertex.value);               
+
+				if(nodeModel.type=='node' || nodeModel.type=='branch'){
+					mxUtils.changeCellAttribute(vertex, 'nodeName', 'Node_' + vertex.id);                 
+				}else if(nodeModel.type=='start'){
+					mxUtils.changeCellAttribute(vertex, 'nodeName', 'START');
+				}else if(nodeModel.type=='end'){
+					mxUtils.changeCellAttribute(vertex, 'nodeName', 'END');                   
+				}else if(nodeModel.type=='form'){
+					mxUtils.changeCellAttribute(vertex, 'nodeName', 'Form');                  
+				}
+
+			}
+		});
+	}
+
 	function initGraph() {
 		// Defines an icon for creating new connections in the connection handler.
 		// This will automatically disable the highlighting of the source vertex.
@@ -261,7 +289,7 @@ const Graph2 = props => {
 					return;
 				}
 				if(cell.edge || cell.vertex) { // line or node
-					menu.addItem('Delete', null, function(e)
+					menu.addItem('Delete', 'images/delete2.png', function(e)
 					{ 
 						graph.removeCells([cell]);
 						mxEvent.consume(evt);
@@ -297,22 +325,88 @@ const Graph2 = props => {
 			  if (!elt) {
 				return;
 			  }
-			  const width = elt.clientWidth;
-			  const height = elt.clientHeight;
+			  let width = elt.clientWidth;
+			  let height = elt.clientHeight;
+			  if (id === 'Generic--Room') {
+				width = 300;
+				height = 300;
+			  }
 		  
 			  const cell = new mxCell('', new mxGeometry(0, 0, width, height), 'fillColor=none;strokeColor=none');
 			  cell.vertex = true;
 			  graph.model.setValue(cell, elt);
-		  
 			  const cells = [cell];
+
+
+
+			  var button = document.createElement('button');
+				button.style.fontSize = '10';
+				var img = document.createElement('img');
+				img.setAttribute('src', 'images/delete2.png');
+				img.style.width = '16px';
+				img.style.height = '16px';
+				img.style.verticalAlign = 'middle';
+				img.style.marginRight = '2px';
+				button.appendChild(img);
+				cell.insert(button, 0);
+
+				// mxEvent.addListener(button, 'click', function(evt)
+				// {
+				// 	editor.execute(action);
+				// });
+				// mxUtils.write(button, label);
+				// toolbar.appendChild(button);
 		  
 			  const bounds = new mxRectangle(0, 0, width, height);
 			  createDragSource(elt, createDropHandler(cells, true, false, bounds), createDragPreview(width, height), cells, bounds);
 			};
 
 			handleEventDragLinkConnect();
-			
+
+			handleCellAddVertex();
+
+			// mxVertexHandler.prototype.resizeCell = function(cell,
+			// 	dx,
+			// 	dy,
+			// 	index,
+			// 	gridEnabled,
+			// 	constrained,
+			// 	recurse	) {
+			// 		console.log(cell);
+			// 		console.log(dx, dy, index);
+
+			// 		const scale = graph.getView().getScale();
+
+			// 		const geometry = graph.getModel().getGeometry(cell);
+			// }
+
+			// mxVertexHandler.prototype.resizeVertex = function(	me	) {
+			// 	console.log(me);
+			// 	return me;
+			// }
+
+			mxGraphHandler.prototype.guidesEnabled = true;
+			mxGuide.prototype.isEnabledForEvent = function(evt)
+			{
+				return !mxEvent.isAltDown(evt);
+			};
+			// Uses the port icon while connections are previewed
+			graph.connectionHandler.getConnectImage = function(state)
+			{
+				return new mxImage(state.style[mxConstants.STYLE_IMAGE], 16, 16);
+			};
+
+			// Centers the port icon on the target port
+			graph.connectionHandler.targetConnectImage = true;
+
+			// Does not allow dangling edges
+			graph.setAllowDanglingEdges(false);
+
+
 			createItem("AWS--Compute--_Instance--Amazon-EC2_A1-Instance_light-bg");
+			createItem("Generic--Room");
+			createItem("Generic--AZ");
+			createItem("Generic--Text");
 			// showIconsWhenHover(graph);
 			console.log('render');
 		}
@@ -329,12 +423,42 @@ const Graph2 = props => {
 			<div className='graph-container'>
 				<div className="toolbar-container" id="toolbar-container-id">
 					{/* FIXME: hardcode */}
-					<div className="MuiListItem-root jss396 MuiListItem-gutters" tabIndex="0" id="leftbar-a1">
+					
+					<div className="ResourceItem-root ResourceItem-style" tabIndex="0" id="leftbar-a1">
+						<div draggable="true" id="Generic--Room" className="MuiListItemIcon-root">
+							<svg className="MuiSvgIcon-root jss402" focusable="false" viewBox="0 0 50 50" aria-hidden="true"><use href="#Generic--Room"></use></svg>
+						</div>
+						<div className="ResourceItem-Title">
+							<p>Region</p>
+						</div>
+					</div>
+
+					<div className="ResourceItem-root ResourceItem-style" tabIndex="0" id="leftbar-a1">
+						<div draggable="true" id="Generic--AZ" className="MuiListItemIcon-root">
+							<svg className="MuiSvgIcon-root jss402" focusable="false" viewBox="0 0 50 50" aria-hidden="true"><use href="#Generic--AZ"></use></svg>
+						</div>
+						<div className="ResourceItem-Title">
+							<p>AZ</p>
+						</div>
+					</div>
+					<div className="ResourceItem-root ResourceItem-style" tabIndex="0" id="leftbar-a1">
+						<div draggable="true" id="Generic--Text" className="MuiListItemIcon-root">
+							<svg className="MuiSvgIcon-root jss402" focusable="false" viewBox="0 0 50 50" aria-hidden="true"><use href="#Generic--Text"></use></svg>
+						</div>
+						<div className="ResourceItem-Title">
+							<p>Text</p>
+						</div>
+					</div>
+
+					<div className="ResourceItem-root ResourceItem-style" tabIndex="0" id="leftbar-a1">
 						<div draggable="true" id="AWS--Compute--_Instance--Amazon-EC2_A1-Instance_light-bg" className="MuiListItemIcon-root">
 							<svg className="MuiSvgIcon-root jss402" focusable="false" viewBox="0 0 50 50" aria-hidden="true"><use href="#AWS--Compute--_Instance--Amazon-EC2_A1-Instance_light-bg"></use></svg>
 						</div>
-						<div className="MuiListItemText-root jss401"><p className="MuiTypography-root MuiListItemText-secondary MuiTypography-body2 MuiTypography-noWrap MuiTypography-displayBlock">EC2 A1 Arm</p></div>
+						<div className="ResourceItem-Title">
+							<p>EC2 A1 Arm</p>
+						</div>
 					</div>
+
 				</div>
 				<div className="main-container" id="main-container-id">
 				</div>
