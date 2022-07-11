@@ -6,7 +6,7 @@ import './../lib/css/common.css';
 import './../lib/css/explorer.css';
 import Panel from './Panel';
 import './grapheditor.css';
-import SvgAwsIcons from './collection-icons/SvgAwsIcons';
+import SpriteSvgAwsIcons from './collection-icons/SpriteSvgAwsIcons';
 
 const mx = require('mxgraph')({
 	mxBasePath: 'mxgraph'
@@ -22,13 +22,15 @@ const {
 	mxUtils,
 	mxCell,
 	mxGeometry,
+	mxConstants,
 	mxParallelEdgeLayout,
 	mxDragSource,
 	mxLayoutManager,
 	mxRubberband,
 	mxKeyHandler,
 	iconTolerance,
-	mxRectangle
+	mxRectangle,
+	mxLog
 } = mx;
 
 const Graph2 = props => {
@@ -78,7 +80,6 @@ const Graph2 = props => {
 		);
 		mxEvent.addListener(img, 'click',
 				mxUtils.bind(this, function (evt) {
-					tooglePanel();
 					graph.removeCells([state.cell]);
 					mxEvent.consume(evt);
 					this.destroy();
@@ -88,11 +89,6 @@ const Graph2 = props => {
 		state.view.graph.container.appendChild(img);
 		this.images.push(img);
 	};
-
-	const tooglePanel = () => {
-		console.log(showPanel);
-		setShowPanel(!showPanel);
-	}
 
 	mxIconSet.prototype.destroy = function () {
 		if (this.images !== null) {
@@ -217,8 +213,21 @@ const Graph2 = props => {
 		});
 	};
 
-	const [showPanel, setShowPanel] = useState(false);
+	function handleEventDragLinkConnect() {
+		graph.connectionHandler.addListener(mxEvent.CONNECT, function(sender, evt)
+		{
+			var edge = evt.getProperty('cell');
+			var source = graph.getModel().getTerminal(edge, true);
+			var target = graph.getModel().getTerminal(edge, false);
 
+			var style = graph.getCellStyle(edge);
+			var sourcePortId = style[mxConstants.STYLE_SOURCE_PORT];
+			var targetPortId = style[mxConstants.STYLE_TARGET_PORT];
+
+			mxLog.show();
+			mxLog.debug('connect', edge, source.id, target.id, sourcePortId, targetPortId);
+		});
+	}
 
 	function initGraph() {
 		// Defines an icon for creating new connections in the connection handler.
@@ -228,7 +237,7 @@ const Graph2 = props => {
 			// Displays an error message if the browser is
 			// not supported.
 			mxUtils.error('Browser is not supported!', 200, false);
-			return {}
+			return {};
 		} else {
 			// Disables built-in context menu
 			mxEvent.disableContextMenu(document.body);
@@ -251,35 +260,12 @@ const Graph2 = props => {
 				if (!cell) {
 					return;
 				}
-				if(cell.edge){
-					menu.addItem('Delete Line', null, function(e)
+				if(cell.edge || cell.vertex) { // line or node
+					menu.addItem('Delete', null, function(e)
 					{ 
-						// alert('This is the first option of edge ');
-						console.log(e);
-						mxUtils.bind(this, function (evt) {
-							console.log(evt);
-							// graph.setSelectionCells(graph.moveCells([state.cell], s, s, true));
-							// mxEvent.consume(evt);
-							// this.destroy();
-						});
-						var s = graph.gridSize;
-						graph.setSelectionCells(graph.moveCells([cell], s, s, true));
+						graph.removeCells([cell]);
 						mxEvent.consume(evt);
-					})
-					menu.addItem('Second edge option', null, function()
-					{
-						alert('This is the second option of edge ');
-					})
-				}
-				if(cell.vertex){
-					menu.addItem('First vertex option', null, function()
-					{
-						alert('This is the first option of vertex ');
-					})
-					menu.addItem('Second vertex option', null, function()
-					{
-						alert('This is the second option of vertex ');
-					})
+					});
 				}
 			};
 		  
@@ -323,22 +309,22 @@ const Graph2 = props => {
 			  const bounds = new mxRectangle(0, 0, width, height);
 			  createDragSource(elt, createDropHandler(cells, true, false, bounds), createDragPreview(width, height), cells, bounds);
 			};
+
+			handleEventDragLinkConnect();
 			
 			createItem("AWS--Compute--_Instance--Amazon-EC2_A1-Instance_light-bg");
-			showIconsWhenHover(graph);
+			// showIconsWhenHover(graph);
 			console.log('render');
 		}
 	}
 
 	useEffect(() => {
 		initGraph();
-		
-		// createItem("AWS--Compute--_Instance--Amazon-EC2_A1-Instance_light-bg");
 	});
 
     return (
 		<div className='geEditor'>
-			<SvgAwsIcons/>
+			<SpriteSvgAwsIcons/>
 
 			<div className='graph-container'>
 				<div className="toolbar-container" id="toolbar-container-id">
@@ -351,7 +337,6 @@ const Graph2 = props => {
 					</div>
 				</div>
 				<div className="main-container" id="main-container-id">
-
 				</div>
 			</div>
         </div>
