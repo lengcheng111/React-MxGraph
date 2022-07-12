@@ -15,7 +15,7 @@ const {
 	mxGraph,
 	mxConnectionHandler,
 	mxImage,
-	mxToolbar,
+	mxPoint,
 	mxGraphModel,
 	mxEvent,
 	mxClient,
@@ -234,24 +234,25 @@ const Graph2 = props => {
 
 	function handleCellAddVertex() {
 		//cells added event
-		graph.addListener(mxEvent.CELLS_ADDED, function(sender, evt) {
-
+		graph.addListener(mxEvent.CELLS_ADDED, function(graph, evt) {
+			console.log(graph);
 			var vertex = evt.getProperties().cells[0];
 			if(vertex.isVertex()){
-				console.log('xxx');
+				console.log(vertex);
+				// vertex.setStyle('display', 'none');
 
-				var decoder = new mxCodec();
-				var nodeModel = decoder.decode(vertex.value);               
+				// var decoder = new mxCodec();
+				// var nodeModel = decoder.decode(vertex.value);               
 
-				if(nodeModel.type=='node' || nodeModel.type=='branch'){
-					mxUtils.changeCellAttribute(vertex, 'nodeName', 'Node_' + vertex.id);                 
-				}else if(nodeModel.type=='start'){
-					mxUtils.changeCellAttribute(vertex, 'nodeName', 'START');
-				}else if(nodeModel.type=='end'){
-					mxUtils.changeCellAttribute(vertex, 'nodeName', 'END');                   
-				}else if(nodeModel.type=='form'){
-					mxUtils.changeCellAttribute(vertex, 'nodeName', 'Form');                  
-				}
+				// if(nodeModel.type=='node' || nodeModel.type=='branch'){
+				// 	mxUtils.changeCellAttribute(vertex, 'nodeName', 'Node_' + vertex.id);                 
+				// }else if(nodeModel.type=='start'){
+				// 	mxUtils.changeCellAttribute(vertex, 'nodeName', 'START');
+				// }else if(nodeModel.type=='end'){
+				// 	mxUtils.changeCellAttribute(vertex, 'nodeName', 'END');                   
+				// }else if(nodeModel.type=='form'){
+				// 	mxUtils.changeCellAttribute(vertex, 'nodeName', 'Form');                  
+				// }
 
 			}
 		});
@@ -327,28 +328,36 @@ const Graph2 = props => {
 			  }
 			  let width = elt.clientWidth;
 			  let height = elt.clientHeight;
-			  if (id === 'Generic--Room') {
+			  let cell = new mxCell('', new mxGeometry(0, 0, width, height), 'fillColor=none;strokeColor=none');
+
+			  if (id === 'Generic--Room' || id === 'Generic--AZ') {
 				width = 300;
 				height = 300;
+				cell = new mxCell('', new mxGeometry(0, 0, width, height), 'fillColor=none');
+				graph.setCellStyles(mxConstants.STYLE_DASHED, '1', [cell]);
+				graph.setCellStyles(mxConstants.STYLE_STROKEWIDTH, '1.5', [cell]);
+				
+				const g = document.createElement('g');
+				g.style.cssText = 'transform: translate(15, -20);border:1px solid red;fill:none';
+
+				graph.getModel().beginUpdate();
+				try
+				{
+					const port = graph.insertVertex(cell, null, '', -10, -15, 70, 40, 'ROUNDED;fillColor=none;');
+					port.geometry.offset = new mxPoint(10, -15);
+				}
+				finally
+				{
+					graph.getModel().endUpdate();
+				}
+			  } else {
+				graph.model.setValue(cell, elt);
 			  }
-		  
-			  const cell = new mxCell('', new mxGeometry(0, 0, width, height), 'fillColor=none;strokeColor=none');
+
 			  cell.vertex = true;
-			  graph.model.setValue(cell, elt);
+			  
+			  
 			  const cells = [cell];
-
-
-
-			  var button = document.createElement('button');
-				button.style.fontSize = '10';
-				var img = document.createElement('img');
-				img.setAttribute('src', 'images/delete2.png');
-				img.style.width = '16px';
-				img.style.height = '16px';
-				img.style.verticalAlign = 'middle';
-				img.style.marginRight = '2px';
-				button.appendChild(img);
-				cell.insert(button, 0);
 
 				// mxEvent.addListener(button, 'click', function(evt)
 				// {
