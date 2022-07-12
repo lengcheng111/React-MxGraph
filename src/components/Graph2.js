@@ -343,8 +343,9 @@ const Graph2 = props => {
 				graph.getModel().beginUpdate();
 				try
 				{
-					const port = graph.insertVertex(cell, null, '', -10, -15, 70, 40, 'ROUNDED;fillColor=none;');
-					port.geometry.offset = new mxPoint(10, -15);
+					const port = graph.insertVertex(cell, null, '', -10, -15, 30, 30, 'fillColor=none;fontSize=9;shape=ellipse;resizable=0;movable=0;connectable=0');
+					port.setConnectable(false);
+					port.geometry.offset = new mxPoint(-10, -105);
 				}
 				finally
 				{
@@ -370,7 +371,7 @@ const Graph2 = props => {
 			  createDragSource(elt, createDropHandler(cells, true, false, bounds), createDragPreview(width, height), cells, bounds);
 			};
 
-			handleEventDragLinkConnect();
+			// handleEventDragLinkConnect();
 
 			handleCellAddVertex();
 
