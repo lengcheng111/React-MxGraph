@@ -334,6 +334,7 @@ const Graph2 = props => {
 				width = 300;
 				height = 300;
 				cell = new mxCell('', new mxGeometry(0, 0, width, height), 'fillColor=none');
+				cell.setConnectable(false);
 				graph.setCellStyles(mxConstants.STYLE_DASHED, '1', [cell]);
 				graph.setCellStyles(mxConstants.STYLE_STROKEWIDTH, '1.5', [cell]);
 				
@@ -345,7 +346,8 @@ const Graph2 = props => {
 				{
 					const port = graph.insertVertex(cell, null, '', -10, -15, 30, 30, 'fillColor=none;fontSize=9;shape=ellipse;resizable=0;movable=0;connectable=0');
 					port.setConnectable(false);
-					port.geometry.offset = new mxPoint(-10, -105);
+					port.geometry.offset = new mxPoint(-10, -155);
+					port.setAttribute('transform', 'translate(10, -15)');
 				}
 				finally
 				{
@@ -356,7 +358,6 @@ const Graph2 = props => {
 			  }
 
 			  cell.vertex = true;
-			  
 			  
 			  const cells = [cell];
 
